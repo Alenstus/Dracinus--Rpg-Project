@@ -18,7 +18,7 @@ public class CursorAffordance : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update() {
+    void LateUpdate() {
         switch (cameraRaycaster.layerHit)
         {
             case Layer.Walkable:
@@ -28,7 +28,7 @@ public class CursorAffordance : MonoBehaviour {
                 Cursor.SetCursor(combatCursor, cursorHotspot, CursorMode.Auto);
                 break;
             default:
-                Debug.LogError("Don't know what cursor to show") 
+                Debug.LogError("Don't know what cursor to show"); 
                 Cursor.SetCursor(errorCursor, cursorHotspot, CursorMode.Auto);
                 return;
         

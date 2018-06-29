@@ -9,10 +9,10 @@ public class SomeObserver : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         cameraRaycaster = GetComponent<CameraRaycaster>();
-        cameraRaycaster.layerChangeObservers += SomeHandlingFunction;
+        cameraRaycaster.onLayerChange += SomeHandlingFunction;
 	}
 	
-	void SomeHandlingFunction()
+	void SomeHandlingFunction(Layer newLayer)
     {
         print("Yahoo, handled from elsewhere");
     }

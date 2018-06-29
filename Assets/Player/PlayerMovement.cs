@@ -98,8 +98,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            print("Cursor raycast hit layer: " + cameraRaycaster.layerHit);
-            switch (cameraRaycaster.layerHit)
+            print("Cursor raycast hit layer: " + cameraRaycaster.currentLayerHit);
+            switch (cameraRaycaster.currentLayerHit)
             {
                 case Layer.Walkable:
                     currentClickTarget = cameraRaycaster.hit.point;

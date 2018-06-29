@@ -2,38 +2,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CursorAffordance : MonoBehaviour {
+[RequireComponent(typeof(CameraRaycaster))]
+public class CursorAffordance : MonoBehaviour
+{
 
     [SerializeField] Texture2D walkCursor = null;
-    [SerializeField] Texture2D errorCursor = null;
-    [SerializeField] Texture2D combatCursor = null;
-    [SerializeField] Vector2 cursorHotspot = new Vector2(96, 96); 
-
+    [SerializeField] Texture2D unknownCursor = null;
+    [SerializeField] Texture2D targetCursor = null;
+    [SerializeField] Vector2 cursorHotspot = new Vector2(0, 0);
 
     CameraRaycaster cameraRaycaster;
 
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
         cameraRaycaster = GetComponent<CameraRaycaster>();
-        cameraRaycaster.layerChangeObservers += OnDelegateCalled; //Registering
+        cameraRaycaster.layerChangeObservers += OnLayerChanged; // registering
     }
 
-    // 
-    void OnDelegateCalled() {
-        print("CursorAffordance delegate reporting for duty!");
-        switch (cameraRaycaster.layerHit)
+    void OnLayerChanged()
+    {
+        print("Cusor over new layer");
+        switch (cameraRaycaster.currentLayerHit)
         {
             case Layer.Walkable:
                 Cursor.SetCursor(walkCursor, cursorHotspot, CursorMode.Auto);
                 break;
+            case Layer.RaycastEndStop:
+                Cursor.SetCursor(unknownCursor, cursorHotspot, CursorMode.Auto);
+                break;
             case Layer.Enemy:
-                Cursor.SetCursor(combatCursor, cursorHotspot, CursorMode.Auto);
+                Cursor.SetCursor(targetCursor, cursorHotspot, CursorMode.Auto);
                 break;
             default:
-                Debug.LogError("Don't know what cursor to show"); 
-                Cursor.SetCursor(errorCursor, cursorHotspot, CursorMode.Auto);
+                Debug.LogError("Don't know what cursor to show");
                 return;
-        
         }
     }
 }
+

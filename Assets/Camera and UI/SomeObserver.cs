@@ -12,8 +12,7 @@ public class SomeObserver : MonoBehaviour {
         cameraRaycaster.onLayerChange += SomeHandlingFunction;
 	}
 	
-	void SomeHandlingFunction(Layer newLayer)
-    {
+	void SomeHandlingFunction(Layer newLayer) {
         print("Yahoo, handled from elsewhere");
     }
 }

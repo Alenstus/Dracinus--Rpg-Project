@@ -3,101 +3,83 @@ using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 
 [RequireComponent(typeof(ThirdPersonCharacter))]
-public class PlayerMovement : MonoBehaviour
-{
+public class PlayerMovement : MonoBehaviour {
+
+    //Public SerializeField Variables
     [SerializeField] float walkMoveStopRadius = 0.2f;
     [SerializeField] float attackMoveStopRadius = 5f;
 
+    //Character Variables
     ThirdPersonCharacter m_Character;   // A reference to the ThirdPersonCharacter on the object
-    CameraRaycaster cameraRaycaster;
     Vector3 currentDestination, clickPoint;
-
-    bool isInDirectMode = false;
-
     bool m_Jump;
     private Vector3 m_Move;
-    Vector3 m_Cam;
-    Vector3 m_CamForward;
 
-    private void Start()
-    {
+    //Movement Mode Toggle Variable
+    bool isInDirectMode = false;
+
+    //Camera Variables
+    CameraRaycaster cameraRaycaster;
+    Vector3 m_Cam , m_CamForward;
+
+    private void Start() {
         ProcessRaycasting();
     }
 
-    private void ProcessRaycasting()
-    {
+    private void ProcessRaycasting() {
         cameraRaycaster = Camera.main.GetComponent<CameraRaycaster>();
         m_Character = GetComponent<ThirdPersonCharacter>();
         currentDestination = transform.position;
     }
 
     // Fixed update is called in sync with physics
-    private void FixedUpdate()
-    {
+    private void FixedUpdate() {
         DecideIfMovementIsDirectOrIndirect();
     }
 
-    private void DecideIfMovementIsDirectOrIndirect()
-    {
-        if (Input.GetKeyDown(KeyCode.G)) // G for gamepad. TODO add to menu
-        {
+    private void DecideIfMovementIsDirectOrIndirect() {
+        if (Input.GetKeyDown(KeyCode.G)) { // G for gamepad. TODO add to menu
             isInDirectMode = !isInDirectMode; // toggle mode
             currentDestination = transform.position; // clear the click target
         }
 
-        if (isInDirectMode)
-        {
+        if (isInDirectMode) {
             ProcessDirectMovement();
         }
-        else
-        {
+        else {
             ProcessJumpAndCrouchAndMouseMovement();
         }
     }
 
-    private void Update()
-    {
-        if (!m_Jump)
-        {
+    private void Update() {
+        if (!m_Jump) {
             m_Jump = Input.GetButtonDown("Jump");
         }
     }
 
-    private void ProcessDirectMovement()
-    {
+    private void ProcessDirectMovement() {
+        //Initialize Movement
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
         bool crouch = Input.GetKey(KeyCode.C);
 
         // calculate move direction to pass to character
-        if (m_Cam != null)
-        {
+        if (m_Cam != null) {
             // calculate camera relative direction to move:
-            m_CamForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
+            m_CamForward = Vector3.Scale(Camera.main.transform.forward,
+                new Vector3(1, 0, 1)).normalized;
             m_Move = v * m_CamForward + h * Camera.main.transform.right;
         }
-        else
-        {
+        else{
             // we use world-relative directions in the case of no main camera
             m_Move = v * Vector3.forward + h * Vector3.right;
         }
-#if !MOBILE_INPUT
-        // walk speed multiplier
-        if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
-#endif
-
-        // pass all parameters to the character control script
-        m_Character.Move(m_Move, crouch, m_Jump); // Movement happens here
-        m_Jump = false;
     }
 
-    private void ProcessJumpAndCrouchAndMouseMovement()
-    {
-        if (Input.GetMouseButton(0))
-        {
+    private void ProcessJumpAndCrouchAndMouseMovement() {
+        if (Input.GetMouseButton(0)) {
             clickPoint = cameraRaycaster.hit.point;
-            switch (cameraRaycaster.currentLayerHit)
-            {
+            switch (cameraRaycaster.currentLayerHit) {
                 case Layer.Walkable:
                     currentDestination = ShortDestination(clickPoint, walkMoveStopRadius);
                     break;
@@ -109,14 +91,15 @@ public class PlayerMovement : MonoBehaviour
                     return;
             }
         }
+
         WalkToDestination();
+
         var playerToClickPoint = currentDestination - transform.position;
-        if (playerToClickPoint.magnitude >= 0)
-        {
+
+        if (playerToClickPoint.magnitude >= 0) {
             m_Character.Move(playerToClickPoint, false, false);
         }
-        else
-        {
+        else {
             m_Character.Move(Vector3.zero, false, false);
         }
         bool crouch = Input.GetKey(KeyCode.C);
@@ -124,27 +107,23 @@ public class PlayerMovement : MonoBehaviour
         m_Jump = false;
     }
 
-    private void WalkToDestination()
-    {
+    private void WalkToDestination() {
+
         var playerToClickPoint = currentDestination - transform.position;
-        if (playerToClickPoint.magnitude >= 0)
-        {
+        if (playerToClickPoint.magnitude >= 0) {
             m_Character.Move(playerToClickPoint, false, false);
         }
-        else
-        {
+        else {
             m_Character.Move(Vector3.zero, false, false);
         }
     }
 
-    Vector3 ShortDestination(Vector3 destination, float shortening)
-    {
+    Vector3 ShortDestination(Vector3 destination, float shortening) {
         Vector3 reductionVector = (destination - transform.position).normalized * shortening;
         return destination - reductionVector;
     }
 
-    void OnDrawGizmos()
-    {
+    void OnDrawGizmos() {
         // Draw movement gizmos
         Gizmos.color = Color.black;
         Gizmos.DrawLine(transform.position, clickPoint);

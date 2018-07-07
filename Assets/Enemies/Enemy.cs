@@ -8,10 +8,8 @@ public class Enemy : MonoBehaviour {
 
     float currentHealthPoints = 100f;
 
-    public float healthAsPercentage
-    {
-        get
-        {
+    public float healthAsPercentage {
+        get {
             return currentHealthPoints / (float)maxHealthPoints;
         }
     }
